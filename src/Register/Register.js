@@ -55,25 +55,43 @@ constructor(props){
   }
 
   RegisterUser = () => {
-    if(this.state.userEmail !== ""){
-      if(this.state.password !== ""){
-        this.setState({ ActivityLoader: true}, () => {
-          return fetch("http://texotrack.com/api/user/login.php",{
+    if(this.state.userName !== ""){
+      if(this.state.userEmail !== ""){
+        if(this.state.userState !== ""){
+          if(this.state.userPhone !== ""){
+            if(this.state.userPassword !== ""){
+            this.setState({ ActivityLoader: true}, () => {
+          const formdata = new FormData();
+          formdata.append('name', this.state.userName);
+          formdata.append('email', this.state.userEmail);
+          formdata.append('state', this.state.userState);
+          formdata.append('phone', this.state.userPhone);
+          formdata.append('password', this.state.userPassword);
+          formdata.append('image', {
+            uri: this.state.image,
+            type: 'image/jpg',
+            name: 'image'
+          });
+          console.log(formdata);
+
+          return fetch("http://texotrack.com/api/user/register.php",{
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'multipart/form-data',
             },
-            body: JSON.stringify({
-              email: this.state.userEmail,
-              password: this.state.password
-            })
+            body: formdata
           }).then((response) => response.json()).then((responseJsonFromServer) =>{
-            this.setState({ActivityLoader: false});
             if(responseJsonFromServer){
-                  AsyncStorage.setItem("key", JSON.stringify(responseJsonFromServer));
-                  this.props.navigation.navigate('App');
+                  this.nameInput.clear();
+                  this.phoneInput.clear();
+                  this.stateInput.clear();
+                  this.emailInput.clear();
+                  this.passInput.clear();
+                  this.setState({ActivityLoader: false})
+                  this.setState({sent:true});
+                  alert("Registration Successful");
             }else{
-              alert("Invalid login credential");
+              alert("Error Registering User. Try again");
             }
           }).catch((error) =>{
             alert("Error connecting to the network. Kindly contact your internet provider if persist");
@@ -81,11 +99,21 @@ constructor(props){
           });
         });
       }else{
-        alert("Enter Password")
+        alert('Create a secure password')
+      }
+      }else{
+        alert("Enter your contact number")
+      }
+      }else{
+        alert("Enter your state (Present Location)")
+      }
+      }else{
+        alert("Enter your email address")
       }
     }else{
-      alert("Enter your Email");
+      alert("Enter your full name");
     }
+
   }
 
   render() {
@@ -107,7 +135,7 @@ constructor(props){
                            </Text>
                            {
                              imageLoaded ? (
-                               <Image source={{uri:this.state.image}} style={{height:100,width:100,borderRadius:50,marginBottom:5}} />
+                               <Image source={{uri:this.state.image}} style={{height:120,width:120,borderRadius:60,marginBottom:5}} />
                              ): <View style={styles.image_placeholder}></View>
                            }
 
@@ -121,6 +149,7 @@ constructor(props){
                   autoCorrect={false}
                   placeholderTextColor="rgba(255,255,255,.7)"
                   name="name"
+                  ref={input => { this.nameInput = input }}
                   onChangeText={(TextInput) => this.setState({userName: TextInput})}
 
                   />
@@ -131,6 +160,7 @@ constructor(props){
                   keyboardType="email-address"
                   autoCapitalize="words"
                   autoCorrect={false}
+                  ref={input => { this.emailInput = input }}
                   onChangeText={(TextInput) => this.setState({userEmail: TextInput})}
                   placeholderTextColor="rgba(255,255,255,.7)"
                   name="email"
@@ -145,6 +175,7 @@ constructor(props){
                   keyboardType="default"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  ref={input => { this.stateInput = input }}
                   onChangeText={(TextInput) => this.setState({userState: TextInput})}
                   placeholderTextColor="rgba(255,255,255,.7)"
                   name="state"
@@ -157,9 +188,10 @@ constructor(props){
                   keyboardType="number-pad"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  ref={input => { this.phoneInput = input }}
                   onChangeText={(TextInput) => this.setState({userPhone: TextInput})}
                   placeholderTextColor="rgba(255,255,255,.7)"
-                  name="email"
+                  name="phone"
 
                   />
 
@@ -171,6 +203,7 @@ constructor(props){
                   autoCapitalize="none"
                   autoCorrect={false}
                   secureTextEntry
+                  ref={input => { this.passInput = input }}
                   onChangeText={(TextInput) => this.setState({userPassword: TextInput})}
                   placeholderTextColor="rgba(255,255,255,.7)"
                   name="email"
@@ -180,7 +213,12 @@ constructor(props){
                   </TouchableOpacity>
 
                    <TouchableOpacity style={styles.buttonContainer} onPress={ this.RegisterUser }>
-                       <Text style={styles.buttonText}>REGISTER</Text>
+                        {
+                          this.state.ActivityLoader ?(
+                             <ActivityIndicator color='green' size='large' style={styles.Activity} />
+                          ): <Text style={styles.buttonText}>REGISTER</Text>
+                        }
+
                    </TouchableOpacity>
                    </View>
 
@@ -259,16 +297,6 @@ textAlign: 'center',
 color:"green",
 fontWeight: '700',
 fontSize: 18
-},
-Activity:{
-position: 'absolute',
-left: 0,
-right: 0,
-top: 150,
-bottom: 0,
-alignItems: 'center',
-justifyContent: 'center',
-zIndex: 999
 },
 image_placeholder:{
   height:120,

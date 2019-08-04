@@ -73,24 +73,15 @@ constructor(props){
                    />
                    <ImageBackground style={{width: "100%",height: height}} source={require('./bg.jpg')} blurRadius={1}>
                    <View style={{flex:1}}>
-                           <View style={styles.title}>
-                            {
-                              this.state.fontLoaded ? (
-                                <Text style={styles.big}>Agro</Text>
-                              ): <Text style={styles.big}>Agro</Text>
-                            }
 
-                               <Text style={styles.small}>An agro based app for farmers</Text>
-                               {
-                                  this.state.ActivityLoader ? <ActivityIndicator color='#FFF' size='large' style={styles.Activity} />: null
-                                }
-                            </View>
-                   <View style={{flex:2,padding: 20,marginTop:30}}>
+                   <View style={{padding: 20,marginTop:30}}>
                           <View style={{alignItems:"center",marginBottom:20}}>
                            <Text style={{color:"white",fontSize:20,fontWeight:"bold"}}>
                               <Ionicons name="md-lock" size={20} color="white" /> Registration
                            </Text>
+                           <View style={styles.image_placeholder}></View>
                            </View>
+                <View style={{display:'flex',flexDirection:'row',justifyContent:'space-between'}}>
                            <TextInput style={styles.input}
                   style={styles.input}
                   placeholder="Name"
@@ -114,6 +105,8 @@ constructor(props){
                   name="email"
 
                   />
+              </View>
+              <View style={{display:'flex',flexDirection:'row',justifyContent:'space-between'}}>
                   <TextInput style={styles.input}
                   style={styles.input}
                   placeholder="State"
@@ -138,6 +131,7 @@ constructor(props){
                   name="email"
 
                   />
+                </View>
                   <TextInput style={styles.input}
                   style={styles.input}
                   placeholder="Password"
@@ -158,8 +152,8 @@ constructor(props){
                    </View>
 
                            <View style={styles.bottomRow}>
-                           <Text style={styles.signupText}> Don't have account ?
-                           <Text style={styles.reg} onPress={() => this.props.navigation.navigate('RegisterScreen')}>REGISTER HERE</Text>
+                           <Text style={styles.signupText}> Already have account ?
+                           <Text style={styles.reg} onPress={() => this.props.navigation.navigate('LoginScreen')}>LOGIN HERE</Text>
                            </Text>
                            </View>
                        </View>
@@ -211,26 +205,27 @@ color: "#FED81E",
 alignItems: "center"
 },
 input: {
-height: 50,
+height: 32,
 backgroundColor: "green",
 color: "#FFF",
 paddingHorizontal: 10,
 marginBottom: 15,
 borderRadius: 7,
-fontSize: 17,
-paddingVertical: 10
+fontSize: 15,
+paddingVertical: 10,
+width:'50%'
 },
 buttonContainer: {
 backgroundColor: "#FFF",
-paddingVertical: 15,
-borderRadius: 8,
+paddingVertical: 10,
+borderRadius: 16,
 marginBottom: 20
 },
 buttonText: {
 textAlign: 'center',
 color:"green",
 fontWeight: '700',
-fontSize: 23
+fontSize: 18
 },
 Activity:{
 position: 'absolute',
@@ -242,4 +237,11 @@ alignItems: 'center',
 justifyContent: 'center',
 zIndex: 999
 },
+image_placeholder:{
+  height:120,
+  width:120,
+  borderRadius:60,
+  borderWidth: 4,
+  borderColor:"#FFF"
+}
 });

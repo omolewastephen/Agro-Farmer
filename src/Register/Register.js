@@ -7,11 +7,11 @@ TouchableOpacity,
 TextInput,
 View,
 StatusBar,
-ImageBackground,
+ImageBackground,Image,
 KeyboardAvoidingView} from 'react-native';
 let {height, width} = Dimensions.get('window');
 import { Ionicons } from '@expo/vector-icons';
-import { Font } from 'expo';
+import { Font,ImagePicker,Permissions,Constants } from 'expo';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import { AsyncStorage } from 'react-native';
 
@@ -26,11 +26,35 @@ constructor(props){
       userPassword: '',
       userEmail: '',
       ActivityLoader: false,
-      userDataAfter: ''
+      sent: false,
+      image:null,
+      imageLoaded: false
+    }
+  }
+  componentDidMount(){
+      this.getPermissionAsync();
+  }
+  getPermissionAsync = async () => {
+    if(Constants.platform.ios){
+      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      if(status !== 'granted'){
+        alert("Camera Roll permission will make this work");
+      }
+    }
+  }
+  _pickImage = async () =>{
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [5,5],
+    });
+    console.log(result);
+    if(!result.cancelled){
+      this.setState({ image: result.uri ,imageLoaded:true})
     }
   }
 
-  LoginUser = () => {
+  RegisterUser = () => {
     if(this.state.userEmail !== ""){
       if(this.state.password !== ""){
         this.setState({ ActivityLoader: true}, () => {
@@ -65,7 +89,9 @@ constructor(props){
   }
 
   render() {
+       const imageLoaded = this.state.imageLoaded;
        return (
+
          <KeyboardAvoidingView behavior={"height"}  style={{flexGrow:1,height:"100%"}}>
                <ScrollView bounces={false} >
                    <StatusBar
@@ -74,15 +100,20 @@ constructor(props){
                    <ImageBackground style={{width: "100%",height: height}} source={require('./bg.jpg')} blurRadius={1}>
                    <View style={{flex:1}}>
 
-                   <View style={{padding: 20,marginTop:30}}>
-                          <View style={{alignItems:"center",marginBottom:20}}>
-                           <Text style={{color:"white",fontSize:20,fontWeight:"bold"}}>
-                              <Ionicons name="md-lock" size={20} color="white" /> Registration
+                   <View style={{padding: 15,marginTop:10}}>
+                          <View style={{alignItems:"center",marginBottom:10}}>
+                           <Text style={{color:"white",fontSize:20,fontWeight:"bold",marginBottom:15}}>
+                              <Ionicons name="md-lock" size={20} color="white" /> Agro::. Farmer's Registration
                            </Text>
-                           <View style={styles.image_placeholder}></View>
-                           </View>
-                <View style={{display:'flex',flexDirection:'row',justifyContent:'space-between'}}>
-                           <TextInput style={styles.input}
+                           {
+                             imageLoaded ? (
+                               <Image source={{uri:this.state.image}} style={{height:100,width:100,borderRadius:50,marginBottom:5}} />
+                             ): <View style={styles.image_placeholder}></View>
+                           }
+
+                      </View>
+
+                <TextInput style={styles.input}
                   style={styles.input}
                   placeholder="Name"
                   returnKeyType="next"
@@ -105,8 +136,8 @@ constructor(props){
                   name="email"
 
                   />
-              </View>
-              <View style={{display:'flex',flexDirection:'row',justifyContent:'space-between'}}>
+
+
                   <TextInput style={styles.input}
                   style={styles.input}
                   placeholder="State"
@@ -131,7 +162,7 @@ constructor(props){
                   name="email"
 
                   />
-                </View>
+
                   <TextInput style={styles.input}
                   style={styles.input}
                   placeholder="Password"
@@ -143,12 +174,14 @@ constructor(props){
                   onChangeText={(TextInput) => this.setState({userPassword: TextInput})}
                   placeholderTextColor="rgba(255,255,255,.7)"
                   name="email"
-
                   />
+                  <TouchableOpacity style={styles.btn} onPress={this._pickImage}>
+                    <Text style={styles.uploadbtn}><Ionicons name="ios-camera"  size={20} color="yellow" /> Add Image</Text>
+                  </TouchableOpacity>
 
-                           <TouchableOpacity style={styles.buttonContainer} onPress={ this.LoginUser }>
-                               <Text style={styles.buttonText}>LOG IN</Text>
-                           </TouchableOpacity>
+                   <TouchableOpacity style={styles.buttonContainer} onPress={ this.RegisterUser }>
+                       <Text style={styles.buttonText}>REGISTER</Text>
+                   </TouchableOpacity>
                    </View>
 
                            <View style={styles.bottomRow}>
@@ -189,7 +222,6 @@ fontWeight:"bold",
 opacity: .8
 },
 bottomRow: {
-padding: 20,
 justifyContent: "center",
 alignItems: "center",
 flex: 3
@@ -198,28 +230,29 @@ signupText: {
 fontSize: 17,
 color:"#FFF",
 fontWeight: "700",
-alignItems: "center"
+alignItems: "center",
+marginBottom:15
 },
 reg: {
 color: "#FED81E",
 alignItems: "center"
 },
 input: {
-height: 32,
+height: 40,
 backgroundColor: "green",
 color: "#FFF",
 paddingHorizontal: 10,
-marginBottom: 15,
+marginBottom: 10,
 borderRadius: 7,
-fontSize: 15,
+fontSize: 17,
 paddingVertical: 10,
-width:'50%'
+width:'100%'
 },
 buttonContainer: {
 backgroundColor: "#FFF",
 paddingVertical: 10,
 borderRadius: 16,
-marginBottom: 20
+marginBottom: 3
 },
 buttonText: {
 textAlign: 'center',
@@ -241,7 +274,20 @@ image_placeholder:{
   height:120,
   width:120,
   borderRadius:60,
-  borderWidth: 4,
+  borderWidth: 2,
   borderColor:"#FFF"
+},
+btn: {
+  backgroundColor: "green",
+  paddingVertical: 15,
+  borderRadius: 3,
+  padding:2,
+  marginBottom: 10
+},
+uploadbtn: {
+  textAlign: 'center',
+  color:"#FFF",
+  fontWeight: '700',
+  fontSize: 18
 }
 });
